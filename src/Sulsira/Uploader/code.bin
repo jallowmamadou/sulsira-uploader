@@ -1,0 +1,140 @@
+<?php 
+
+					if ($input['photo']) {
+
+							$not = 'media'.DS.'customer'.DS.$person->pers_fname.'_'.$person->pers_mname.'_'.$person->pers_lname.'_'.$person->id;
+							$foldername = DS.$not.DS;
+							// $full_dir = $foldername.'img'.DS.'full';
+
+							$path = base_path().$foldername ;
+							$thumbnail_dir = $not.DS.'img'.DS.'thumbnail'.DS;
+							$fileexten = Input::file('photo')->getClientOriginalExtension();
+							$filename = Input::file('photo')->getClientOriginalName();
+							// dd($path);
+							$shortened = base_convert(rand(10000,99999), 10, 36);
+							$rename = $person->pers_fname.'_'.$shortened.'_photo_.'.$filename;
+							$filetyp = Input::file('photo')->getMimeType();
+							$fileexten = Input::file('photo')->getClientOriginalExtension();
+							$uploaded = false;
+
+							if ( (File::exists($path)) && ( File::exists( $path.DS.'img'.DS ) ) && ( File::exists( $path.DS.'img'.DS.'thumbnail') ) ) {
+
+								Input::file('photo')->move($path.DS.'img'.DS, $rename);
+
+									#notice #01
+										// there was a problem when trying to resize the image. the fix is go in the project dir (html but ! include)
+
+									// we resize (250 X 300)
+									$img = Image::make($not.$rename);
+									$img->resize(250 , 300);
+									$img->save($thumbnail_dir.$rename);	// we move to thumnails
+
+								// store in the database
+								Document::create(array(
+										'title' => 'profile picture' ,
+										'entity_type' => 'Person',
+										'entity_ID' => $person->id,
+										'type' => 'Photo',
+										'fullpath' => $path.DS.'img'.DS.$rename,
+										'filename' => $filename,
+										'foldername' => $not,
+										'extension' => $fileexten,
+										'filetype' => $filetyp,
+										'thumnaildir' => $thumbnail_dir.$rename
+									));
+								
+								# code...
+							}else{
+								mkdir($path, 0755, true);
+								mkdir($path.DS.'img'.DS, 0755, true);
+								mkdir($path.DS.'img'.DS.'thumbnail', 0755, true);
+								Input::file('photo')->move($path.DS.'img'.DS , $rename);
+									// we resize (250 X 300)
+									// dd($not.DS.$rename);
+									$img = Image::make($not.DS.'img'.DS.$rename);
+									$img->resize(250 , 300);
+									$img->save($thumbnail_dir.$rename);	// we move to thumnails
+
+								// store in the database
+								Document::create(array(
+										'title' => 'profile picture' ,
+										'entity_type' => 'Person',
+										'entity_ID' => $person->id,
+										'type' => 'Photo',
+										'fullpath' =>  $path.DS.'img'.DS.$rename,
+										'filename' => $filename,
+										'foldername' => $not,
+										'extension' => $fileexten,
+										'filetype' => $filetyp,
+										'thumnaildir' => $thumbnail_dir.$rename
+									));
+							}
+					} #end of photo
+
+
+					if ($input['document']) {
+
+
+							$not = 'media'.DS.'customer'.DS.$person->pers_fname.'_'.$person->pers_mname.'_'.$person->pers_lname.'_'.$person->id;
+							$foldername = DS.$not.DS;
+							// $full_dir = $foldername.'img'.DS.'full';
+							
+							$path = base_path().$foldername ;
+							$fileexten = Input::file('document')->getClientOriginalExtension();
+							$filename = Input::file('document')->getClientOriginalName();
+							// dd($path);
+							$shortened = base_convert(rand(10000,99999), 10, 36);
+							$rename = $person->pers_fname.'_'.$shortened.'_document_.'.$filename;
+							$filetyp = Input::file('document')->getMimeType();
+							$fileexten = Input::file('document')->getClientOriginalExtension();
+							$uploaded = false;
+
+							if ( File::exists($path)  && ( File::exists( $path.DS.'document'.DS ) ) )  {
+
+								Input::file('document')->move($path , $rename);
+
+									#notice #01
+										// there was a problem when trying to resize the image. the fix is go in the project dir (html but ! include)
+
+									// we resize (250 X 300)
+									// $img = Image::make($not.$rename);
+									// $img->resize(250 , 300);
+									// $img->save($thumbnail_dir.$rename);	// we move to thumnails
+
+								// store in the database
+								Document::create(array(
+										'title' => $filename ,
+										'entity_type' => 'Person',
+										'entity_ID' => $person->id,
+										'type' => 'Document',
+										'fullpath' => $path.$rename,
+										'filename' => $filename,
+										'foldername' => $not,
+										'extension' => $fileexten,
+										'filetype' => $filetyp
+									));
+								
+								# code...
+							}else{
+								File::exists($path) ?: mkdir($path, 0755, true);
+								mkdir($path.DS.'document'.DS, 0755, true);
+								Input::file('document')->move($path.DS.'document'.DS , $rename);
+									// we resize (250 X 300)
+									// $img = Image::make($not.$rename);
+									// $img->resize(250 , 300);
+									// $img->save($thumbnail_dir.$rename);	// we move to thumnails
+
+								// store in the database
+								Document::create(array(
+										'title' => $filename ,
+										'entity_type' => 'Person',
+										'entity_ID' => $person->id,
+										'type' => 'Document',
+										'fullpath' => $path.$rename,
+										'filename' => $filename,
+										'foldername' => $not,
+										'extension' => $fileexten,
+										'filetype' => $filetyp
+									));
+							}
+					} #end of photo
